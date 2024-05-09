@@ -1,0 +1,92 @@
+-- ALL DATA was collected from 
+--https://www.kaggle.com/code/micahlawrence/coachella-2024-artist-analysis#7.-What-artists-are-the-most-buzz-worthy?
+
+--How many artists were billed to perform at Coachella in 2024?
+SELECT DISTINCT COUNT(id) AS billed_artists
+FROM COACHELLA2024.artists;
+--Were most acts solo, duos or groups?
+SELECT  MAX(TYPE)
+FROM artists
+WHERE type IN ('Solo','Duo','Group');
+
+SELECT type,
+COUNT(*) AS count,
+ROUND((COUNT(*) * 100 / (SELECT COUNT(*) FROM artists)),1) AS percentage
+FROM artists
+GROUP BY type
+ORDER BY COUNT(*) DESC;
+--How do these artists breakdown by genre?
+SELECT genre,
+COUNT(*) AS count,
+ROUND((COUNT(*) * 100 / (SELECT COUNT(*) FROM artists)),1) AS percentage
+FROM artists
+GROUP BY genre
+ORDER BY COUNT(*) DESC;
+--How do these acts break down by gender?
+SELECT gender,
+COUNT(*) AS count,
+ROUND((COUNT(*) * 100 / (SELECT COUNT(*) FROM artists)),1) AS percentage
+FROM artists
+GROUP BY gender
+ORDER BY COUNT(*) DESC;
+--What are the most and least represented countries at Coachella?
+SELECT country,
+COUNT(*) AS number_of_artists
+FROM artists
+GROUP BY country
+ORDER BY number_of_artists DESC;
+--Who is the most popular artist?
+SELECT artist_name,
+popularity_index 
+FROM spotify_data 
+JOIN artists 
+ON spotify_data.artist_id=artists.id
+ORDER BY popularity_index DESC
+LIMIT 1;
+--What artists are the most buzz worthy?
+SELECT AVG(playlists) AS avg_playslists,
+AVG(playlist_reach/playlists) AS avg_playlist_to_reach_ratio
+FROM spotify_data;
+
+SELECT a.artist_name,
+sd.followers,
+sd.playlist,
+sd.playlist_reach,
+FROM artists a
+JOIN spotify_data sd
+ON a.id=sd.artist_id
+WHERE (sd.playlist_reach/sd.playlists) > 20126 AND sd.playlists < 9903 AND sd.artist_rank IS NOT NULL
+ORDER BY playlist_to_reach_ratio DESC;
+SELECT 
+a.artist_name,
+sd.followers,
+sd.playlists,
+sd.playlist_reach,
+(sd.playlist_reach / sd.playlists) AS playlist_to_reach_ratio
+FROM artists a
+JOIN spotify_data sd ON a.id = sd.artist_id
+WHERE(sd.playlist_reach / sd.playlists) > 20126 AND playlists < 9903 AND sd.artist_rank IS NOT NULL 
+ORDER BY playlist_to_reach_ratio DESC;
+
+--How many monthly listeners do Coachella artists have?
+SELECT artist_name,monthly_listeners
+FROM artists
+JOIN spotify_data
+ON artists.id=spotify_data.artist_id
+GROUP BY artist_name,monthly_listeners
+ORDER BY monthly_listeners DESC;
+--Were most acts returning acts or new to Coachella?
+SELECT new_or_returning,
+COUNT(*) AS count, 
+ROUND((COUNT(*) * 100 / (SELECT COUNT(*) FROM lineup)),2) AS percentage
+FROM lineup
+GROUP BY new_or_returning;
+--What was the genre breakdown by stage?
+SELECT gender,
+COUNT(*) AS count,
+stage
+FROM artists
+JOIN lineup
+ON artists.id=lineup.artist_id
+GROUP BY gender
+ORDER BY count DESC;

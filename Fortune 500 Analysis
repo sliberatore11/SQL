@@ -76,13 +76,13 @@ FROM fortune_companies
 GROUP BY industry
 HAVING avg_revenue_billions>=200;
 
---# Assign all the companies in the Healthcare industry as "mother friendly workplace", "acceptable", or   "abysmal" based on the maternity leave offered. 
-
+--# Assign all the companies in the Healthcare industry as "mother friendly workplace", "acceptable", or "abysmal" based on the maternity leave offered. 
 SELECT company_name,
 CASE 
-WHEN maternity_leave_weeks>=10 THEN 'mother friendly workplace'
-WHEN maternity_leave_weeks>=8 THEN 'acceptable'
-ELSE 'abysmal' 
-END AS FRIENDLY
+    WHEN maternity_leave_weeks >= 10 THEN 'mother friendly workplace'
+	WHEN maternity_leave_weeks >= 8 THEN 'acceptable'
+	ELSE 'abysmal'
+	END as mother_friendliness
 FROM fortune_companies
-WHERE industry='Healthcare';
+WHERE industry='Healthcare'
+ORDER BY mother_friendliness;
